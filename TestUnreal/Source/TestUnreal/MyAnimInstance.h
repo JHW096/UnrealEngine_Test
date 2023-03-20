@@ -18,6 +18,11 @@ class TESTUNREAL_API UMyAnimInstance : public UAnimInstance
 
 private:
 
+	//Move
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Pawn, Meta=(AllowPrivateAccess=true))
 	float Speed;
+
+	//Jump
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Pawn, Meta=(AllowPrivateAccess=true))
+	bool isFalling;
 };
