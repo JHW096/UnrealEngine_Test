@@ -46,6 +46,9 @@ void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	/*매 프레임마다 확인 하는 것이 아닌, Montage가 끝났을 때 한 번만 체크하여 성능상 이점이 있다. */
+	AnimInstance = Cast<UMyAnimInstance>(GetMesh()->GetAnimInstance());
+	AnimInstance->OnMontageEnded.AddDynamic(this, &AMyCharacter::OnAttackMontageEnded);
 }
 
 // Called every frame
@@ -77,12 +80,19 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 void AMyCharacter::Attack()
 {
 	/*매 틱마다 호출되는 함수가 아니라서 Character쪽에서 관리하는 것이 나아보인다 라는 의견이 있음!*/
-	auto AnimInstance = Cast<UMyAnimInstance>(GetMesh()->GetAnimInstance());
-
-	if (AnimInstance)
+	if (IsAttacking)
 	{
-		AnimInstance->PlayAttackMontage();
+		return;
 	}
+
+	AnimInstance->PlayAttackMontage();
+	
+	IsAttacking = true;
+}
+
+void AMyCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	IsAttacking = false;
 }
 
 void AMyCharacter::UpDown(float Value)

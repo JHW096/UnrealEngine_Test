@@ -19,11 +19,8 @@ UMyAnimInstance::UMyAnimInstance()
 
 void UMyAnimInstance::PlayAttackMontage()
 {
-	//중복되지 않게
-	if (!Montage_IsPlaying(AttackMontage))
-	{
-		Montage_Play(AttackMontage, 1.0f);
-	}
+	
+	Montage_Play(AttackMontage, 1.0f);
 }
 
 void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
