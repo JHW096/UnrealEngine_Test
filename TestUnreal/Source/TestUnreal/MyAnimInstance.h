@@ -16,6 +16,11 @@ class TESTUNREAL_API UMyAnimInstance : public UAnimInstance
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+public:
+	UMyAnimInstance();
+
+	void PlayAttackMontage();
+
 private:
 
 	//Move
@@ -25,4 +30,8 @@ private:
 	//Jump
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Pawn, Meta=(AllowPrivateAccess=true))
 	bool isFalling;
+
+	//Attack
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, Meta = (AllowPrivateAccess = true))
+	UAnimMontage* AttackMontage;
 };

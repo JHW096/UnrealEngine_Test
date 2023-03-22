@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/Capsulecomponent.h"
+#include "MyAnimInstance.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -66,10 +67,22 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		JumpKeyHoldTime = 0.0f;
 	}*/
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AMyCharacter::Jump);
+	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &AMyCharacter::Attack);
 	
 	PlayerInputComponent->BindAxis(TEXT("UpDown"), this, &AMyCharacter::UpDown);
 	PlayerInputComponent->BindAxis(TEXT("LeftRight"), this, &AMyCharacter::LeftRight);
 	PlayerInputComponent->BindAxis(TEXT("Yaw"), this, &AMyCharacter::Yaw);
+}
+
+void AMyCharacter::Attack()
+{
+	/*매 틱마다 호출되는 함수가 아니라서 Character쪽에서 관리하는 것이 나아보인다 라는 의견이 있음!*/
+	auto AnimInstance = Cast<UMyAnimInstance>(GetMesh()->GetAnimInstance());
+
+	if (AnimInstance)
+	{
+		AnimInstance->PlayAttackMontage();
+	}
 }
 
 void AMyCharacter::UpDown(float Value)
