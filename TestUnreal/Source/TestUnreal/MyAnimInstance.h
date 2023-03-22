@@ -20,6 +20,14 @@ public:
 	UMyAnimInstance();
 
 	void PlayAttackMontage();
+	void JumpToSection(int32 SectionIndex);
+
+	FName GetAttackMontageName(int32 SectionIndex);
+
+private:
+
+	UFUNCTION()
+	void AnimNotify_AttackHit();
 
 private:
 
