@@ -4,6 +4,7 @@
 #include "MyAnimInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "MyCharacter.h"
 
 
 UMyAnimInstance::UMyAnimInstance()
@@ -53,10 +54,13 @@ void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		//속도의 크기를 받아옴.
 		Speed = pawn->GetVelocity().Size();
 
-		auto Character = Cast<ACharacter>(pawn);
+		auto Character = Cast<AMyCharacter>(pawn);
 		if (Character)
 		{
 			isFalling = Character->GetMovementComponent()->IsFalling();
+
+			Vertical = Character->UpDownValue;
+			Horizontal = Character->LeftRightValue;
 		}
 	}
 }

@@ -100,19 +100,14 @@ void AMyCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted
 
 void AMyCharacter::UpDown(float Value)
 {
-	if (Value == 0.0f)
-	{
-		return;
-	}
+	UpDownValue = Value;
+	
 	AddMovementInput(GetActorForwardVector(), Value);
 }
 
 void AMyCharacter::LeftRight(float Value)
 {
-	if (Value == 0.0f)
-	{
-		return;
-	}
+	LeftRightValue = Value;
 
 	AddMovementInput(GetActorRightVector(), Value);
 }
