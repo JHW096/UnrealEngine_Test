@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/Capsulecomponent.h"
 #include "MyAnimInstance.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -46,9 +47,24 @@ void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	
+}
+
+void AMyCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
 	/*매 프레임마다 확인 하는 것이 아닌, Montage가 끝났을 때 한 번만 체크하여 성능상 이점이 있다. */
 	AnimInstance = Cast<UMyAnimInstance>(GetMesh()->GetAnimInstance());
-	AnimInstance->OnMontageEnded.AddDynamic(this, &AMyCharacter::OnAttackMontageEnded);
+
+	//Null check
+	if (AnimInstance)
+	{
+		AnimInstance->OnMontageEnded.AddDynamic(this, &AMyCharacter::OnAttackMontageEnded);
+		AnimInstance->OnAttackHit.AddUObject(this, &AMyCharacter::AttackCheck);
+	}
+
+
 }
 
 // Called every frame
@@ -91,6 +107,59 @@ void AMyCharacter::Attack()
 	AttackIndex = (AttackIndex + 1) % 3;
 	
 	IsAttacking = true;
+}
+
+void AMyCharacter::AttackCheck()
+{
+	FHitResult HitResult;
+
+	FCollisionQueryParams Params(NAME_None, false, this);
+
+	float AttackRange = 100.0f;
+	float AttackRadius = 50.0f;
+
+	//피격 판정
+	//Params는 문서 참고.
+	bool bResult = GetWorld()->SweepSingleByChannel(
+		OUT HitResult,
+		GetActorLocation(),
+		GetActorLocation() + GetActorForwardVector() *  AttackRange,
+		FQuat::Identity,
+		ECollisionChannel::ECC_EngineTraceChannel2, //Attack Channel
+		FCollisionShape::MakeSphere(AttackRadius),
+		Params
+	);
+
+	FVector Vec = GetActorForwardVector() * AttackRange;
+	FVector Center = GetActorLocation() + Vec * 0.5f;
+	float HalfHeight = AttackRange * 0.5f + AttackRadius;
+	FQuat Rotation = FRotationMatrix::MakeFromZ(Vec).ToQuat();
+	FColor DrawColor;
+
+	if (bResult)
+	{
+		DrawColor = FColor::Green;
+	}
+	else
+	{
+		DrawColor = FColor::Red;
+	}
+
+	DrawDebugCapsule(
+		GetWorld(),
+		Center,
+		HalfHeight,
+		AttackRadius,
+		Rotation,
+		DrawColor,
+		false,
+		2.0f
+	);
+
+	if (bResult && HitResult.Actor.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *HitResult.Actor->GetName());
+	}
 }
 
 void AMyCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)

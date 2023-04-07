@@ -6,6 +6,8 @@
 #include "Animation/AnimInstance.h"
 #include "MyAnimInstance.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnAttackHit);
+
 /**
  * 
  */
@@ -14,10 +16,10 @@ class TESTUNREAL_API UMyAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-
 public:
 	UMyAnimInstance();
+
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	void PlayAttackMontage();
 	void JumpToSection(int32 SectionIndex);
@@ -48,4 +50,10 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Pawn, Meta=(AllowPrivateAccess = true))
 	float Vertical;
+
+
+//юс╫ц public
+public:
+	
+	FOnAttackHit OnAttackHit;
 };

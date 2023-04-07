@@ -37,7 +37,10 @@ FName UMyAnimInstance::GetAttackMontageName(int32 SectionIndex)
 
 void UMyAnimInstance::AnimNotify_AttackHit()
 {
+	//Simple Attack Log
 	UE_LOG(LogTemp, Log, TEXT("AnimNotify_AttackHit"));
+
+	OnAttackHit.Broadcast();
 }
 
 void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
