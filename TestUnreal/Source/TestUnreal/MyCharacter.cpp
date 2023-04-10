@@ -68,11 +68,11 @@ void AMyCharacter::BeginPlay()
 	
 	if (CurrentWeapon)
 	{
-		CurrentWeapon->AttachToComponent(
+		/*CurrentWeapon->AttachToComponent(
 			GetMesh(),
 			FAttachmentTransformRules::SnapToTargetIncludingScale,
 			WeaponSocket
-		);
+		);*/
 	}
 
 }
