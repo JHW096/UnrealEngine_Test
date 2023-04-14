@@ -8,6 +8,7 @@
 #include "MyAnimInstance.h"
 #include "DrawDebugHelpers.h"
 #include "MyWeapon.h"
+#include "MyStatComponent.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -41,6 +42,9 @@ AMyCharacter::AMyCharacter()
 		GetMesh()->SetSkeletalMesh(SM.Object);
 	}
 
+	//add StatComponent
+	Stat = CreateDefaultSubobject<UMyStatComponent>(TEXT("STAT"));
+	
 	/*FName WeaponSocket(TEXT("hand_l_socket"));
 	if (GetMesh()->DoesSocketExist(WeaponSocket))
 	{
@@ -120,6 +124,13 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis(TEXT("Yaw"), this, &AMyCharacter::Yaw);
 }
 
+float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Stat->OnAttacked(DamageAmount);
+	
+	return DamageAmount;
+}
+
 void AMyCharacter::Attack()
 {
 	/*매 틱마다 호출되는 함수가 아니라서 Character쪽에서 관리하는 것이 나아보인다 라는 의견이 있음!*/
@@ -186,6 +197,14 @@ void AMyCharacter::AttackCheck()
 	if (bResult && HitResult.Actor.IsValid())
 	{
 		UE_LOG(LogTemp, Log, TEXT("Hit Actor : %s"), *HitResult.Actor->GetName());
+
+		//대부분의 경우는 피격당하는 입장쪽에서 피격 함수를 처리하는게 깔끔하다.
+		//도트 데미지, 공격자에 대한 어그로 판별 등 때문에 그러하다.
+		/*HitResult.Actor->TakeDamage(
+			
+		);*/
+		FDamageEvent DamageEvnet;
+		HitResult.Actor->TakeDamage(Stat->GetAttack(), DamageEvnet, GetController(), this);
 	}
 }
 
