@@ -9,6 +9,9 @@
 #include "DrawDebugHelpers.h"
 #include "MyWeapon.h"
 #include "MyStatComponent.h"
+#include "Components/WidgetComponent.h"
+#include "MyCharacterWidget.h"
+
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -16,6 +19,7 @@ AMyCharacter::AMyCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//--------------Camera----------------------
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
 
@@ -32,6 +36,8 @@ AMyCharacter::AMyCharacter()
 		FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f)
 	);
 
+
+	//--------------------SkelMesh----------------------------
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SM(
 		TEXT("SkeletalMesh'/Game/ParagonGreystone/Characters/Heroes/Greystone/Meshes/Greystone.Greystone'")
 	);
@@ -42,23 +48,29 @@ AMyCharacter::AMyCharacter()
 		GetMesh()->SetSkeletalMesh(SM.Object);
 	}
 
-	//add StatComponent
+	//------------------------Stat-------------------------------
 	Stat = CreateDefaultSubobject<UMyStatComponent>(TEXT("STAT"));
 	
-	/*FName WeaponSocket(TEXT("hand_l_socket"));
-	if (GetMesh()->DoesSocketExist(WeaponSocket))
+	
+	//-----------------------HP UI---------------------------------
+	HpBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBAR"));
+	HpBar->SetupAttachment(GetMesh());
+	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
+
+	//EWidgetSpace::World or Screen
+	//월드에 배치(일반 물체 처럼)
+	//Screen : 항상 잘리지 않고 보인다. 일반적으로 생각하는 UI
+	HpBar->SetWidgetSpace(EWidgetSpace::Screen);
+
+	//BluePrint를 Class로 사용시 경로 마지막에 _C
+	static ConstructorHelpers::FClassFinder<UUserWidget> UW(
+		TEXT("WidgetBlueprint'/Game/UI/WBP_HpBar.WBP_HpBar_C'"));
+
+	if (UW.Succeeded())
 	{
-		Weapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WEAPON"));
-		static ConstructorHelpers::FObjectFinder<UStaticMesh> SW(
-			TEXT("StaticMesh'/Game/ParagonGreystone/FX/Meshes/Heroes/Greystone/SM_Greystone_Blade_01.SM_Greystone_Blade_01'"));
-		if (SW.Succeeded())
-		{
-			Weapon->SetStaticMesh(SW.Object);
-		}
-
-		Weapon->SetupAttachment(GetMesh(), WeaponSocket);
-	}*/
-
+		HpBar->SetWidgetClass(UW.Class);
+		HpBar->SetDrawSize(FVector2D(200.0f, 50.0f));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -95,7 +107,10 @@ void AMyCharacter::PostInitializeComponents()
 		AnimInstance->OnAttackHit.AddUObject(this, &AMyCharacter::AttackCheck);
 	}
 
+	//version에 따라 작동이 안될 수 있으니 해줍시다.
+	HpBar->InitWidget();
 
+	//TODO : 체력의 상황에 따라 delegate Bind
 }
 
 // Called every frame
