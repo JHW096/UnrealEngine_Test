@@ -111,6 +111,11 @@ void AMyCharacter::PostInitializeComponents()
 	HpBar->InitWidget();
 
 	//TODO : 체력의 상황에 따라 delegate Bind
+	auto HpWidget = Cast<UMyCharacterWidget>(HpBar->GetUserWidgetObject());
+	if (HpWidget)
+	{
+		HpWidget->BindHp(Stat);
+	}
 }
 
 // Called every frame
